@@ -1,14 +1,36 @@
 from snakemake.utils import min_version
+import pandas as pd
 
 ##### set minimum snakemake version #####
-min_version("5.10.0") # tested in 5.10.0
+min_version("5.10.0")  # tested in 5.10.0
 
-samples: config/samples.tsv
-configfile: config/config.yaml
+samples = pd.read_csv("config/samples.tsv", sep="\t")
+is_paired = "fastq2" in samples.columns
+
 
 def get_samples():
     """Returns list of all samples."""
     return list(samples["sample"].unique())
+
+
+def get_samples_with_lane():
+    """Returns list of all combined lane/sample identifiers."""
+    return list((samples["sample"] + "." + samples["lane"]).unique())
+
+
+def get_sample_lanes(sample):
+    """Returns lanes for given sample."""
+    subset = samples.loc[samples["sample"] == sample]
+    return list(subset["lane"].unique())
+
+
+configfile: "config/config.yaml"
+
+
+def get_samples():
+    """Returns list of all samples."""
+    return list(samples["sample"].unique())
+
 
 include: "rules/common.smk"
 include: "rules/trim.smk"
@@ -16,7 +38,8 @@ include: "rules/align.smk"
 include: "rules/count.smk"
 include: "rules/qc.smk"
 
+
 rule all:
     input:
-        "counts/merged.txt",
-        "qc/multiqc_report.html"
+        "results/counts/merged.txt",
+        "results/qc/multiqc_report.html",
