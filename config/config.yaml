@@ -1,0 +1,42 @@
+is_paired: True
+input:
+  dir: "resources/input/"
+
+# Single-end config for cutadapt.
+cutadapt_se:
+  params:
+    adapters=" -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA",
+    extra="-q 20 --minimum-length 20"
+
+# Paired-end config for cutadapt.
+cutadapt_pe:
+  params:
+    adapters=" -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT",
+    extra="-q 20 --minimum-length 20"
+
+star:
+  index: '/home/ro.d.bruijn/projects/catrin-cellline-injection-project/only_cellline/references/star_Homo_sapiens.GRCh38.101'
+  readgroup: >-
+    ID:{sample}.{lane} SM:{sample} LB:{sample}
+    PU:{sample}.{lane} PL:ILLUMINA CN:NKI-AvL
+  extra: "--outSAMtype BAM Unsorted"
+  threads: 10
+
+sambamba_sort:
+  extra: ''
+  threads: 10
+
+samtools_merge:
+  extra: ''
+  threads: 10
+
+feature_counts:
+  annotation: '/home/ro.d.bruijn/projects/catrin-cellline-injection-project/only_cellline/references/Homo_sapiens.GRCh38.101.gtf'
+  extra: ''
+  threads: 5
+
+multiqc:
+  extra: ''
+
+fastqc:
+  extra: ''

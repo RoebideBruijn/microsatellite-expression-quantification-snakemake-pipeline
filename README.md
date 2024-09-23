@@ -1,7 +1,2 @@
 # microsatellite-expression-quantification-snakemake-pipeline
-Quantify expression of RNA microsatellites using a snakemake pipeline
-
-
-test
-
-Test3
+Quantify expression of RNA microsatellites using a snakemake workflow

@@ -1,0 +1,22 @@
+from snakemake.utils import min_version
+
+##### set minimum snakemake version #####
+min_version("5.10.0") # tested in 5.10.0
+
+samples: config/samples.tsv
+configfile: config/config.yaml
+
+def get_samples():
+    """Returns list of all samples."""
+    return list(samples["sample"].unique())
+
+include: "rules/common.smk"
+include: "rules/trim.smk"
+include: "rules/align.smk"
+include: "rules/count.smk"
+include: "rules/qc.smk"
+
+rule all:
+    input:
+        "counts/merged.txt",
+        "qc/multiqc_report.html"
