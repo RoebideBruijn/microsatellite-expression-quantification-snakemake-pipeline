@@ -32,7 +32,7 @@ star:
   readgroup: >-
     ID:{sample}.{lane} SM:{sample} LB:{sample}
     PU:{sample}.{lane} PL:ILLUMINA CN:NKI-AvL
-  extra: "--outSAMtype BAM Unsorted"
+  extra: "" # "--outSAMtype BAM Unsorted"
   threads: 10
 
 sambamba_sort:

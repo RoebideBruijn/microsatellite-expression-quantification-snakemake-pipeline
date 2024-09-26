@@ -14,10 +14,9 @@ rule feature_counts:
         samples="results/bam/final/{sample}.bam",
         annotation=config["feature_counts"]["annotation"],
     output:
-        counts="results/counts/per_sample/{sample}.txt",
-        summary="results/qc/feature_counts/{sample}.txt",
+        "results/counts/per_sample/{sample}.txt",
     params:
-        extra=feature_counts_extra,
+        extra=" -p",
     threads: config["feature_counts"]["threads"]
     log:
         "results/logs/feature_counts/{sample}.txt",

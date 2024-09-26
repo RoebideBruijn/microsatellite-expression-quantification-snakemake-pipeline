@@ -1,12 +1,13 @@
-def star_inputs(wildcards):
-    """Returns fastq inputs for star."""
+#def star_inputs(wildcards):
+#    """Returns fastq inputs for star."""
 
-    base_path = "results/fastq/trimmed/{sample}.{lane}.{{pair}}.fastq.gz".format(
-        sample=wildcards.sample, lane=wildcards.lane
-    )
-    pairs = ["R1", "R2"] if is_paired else ["R1"]
+#    base_path = "results/fastq/trimmed/{sample}.{lane}.{{pair}}.fastq.gz".format(
+#        sample=wildcards.sample, lane=wildcards.lane
+#    )
+#    pairs = ["R1", "R2"] if is_paired else ["R1"]
+#    print(expand(base_path, pair=pairs))
+#    return expand(base_path, pair=pairs)
 
-    return expand(base_path, pair=pairs)
 
 
 def star_extra(star_config):
@@ -40,23 +41,25 @@ rule star_index:
     params:
         extra="--sjdbGTFfile resources/references/Homo_sapiens.GRCh38.112.gtf --sjdbOverhang 50",
     log:
-        "logs/star_index_hg38_human_overhang50.log",
+        "results/logs/star_index/hg38_human_overhang50.log",
     wrapper:
         "v4.5.0/bio/star/index"
 
 
-# 'Standard' alignment rules.
-rule star:
+rule star_align_pe:
     input:
-        star_inputs,
+        fq1="results/fastq/trimmed/{sample}.{lane}.R1.fastq.gz",
+        fq2="results/fastq/trimmed/{sample}.{lane}.R2.fastq.gz",
         idx=config["star"]["index"],
-        gtf=config["feature_counts"]["annotation"],
-    output:
-        aln="results/bam/star/{sample}.{lane}/Aligned.out.bam",
+    output: 
+        aln="results/bam/star/{sample}.{lane}/Aligned.out.bam",            
+        #log="results/logs/pe/{sample}.{lane}/Log.out",
+        #sj="results/bam/star/pe/{sample}.{lane}/SJ.out.tab",
+        #mapped=["results/bam/star/pe/{sample}.{lane}/unmapped.R1.fastq.gz","star/pe/{sample}.{lane}/unmapped.R2.fastq.gz"]
     log:
-        "results/logs/star/{sample}.{lane}.log",
+        "results/logs/star_align/{sample}.{lane}.log",
     params:
-        extra=star_extra(config["star"]),
+        extra="--outSAMtype BAM Unsorted",
     resources:
         memory=30,
     threads: config["star"]["threads"]
@@ -66,16 +69,15 @@ rule star:
 
 rule sambamba_sort:
     input:
-        "results/bam/star/{sample}.{lane}/Aligned.out.bam",
+        "results/bam/star/{sample}.{lane}/Aligned.out.bam"
     output:
-        "results/bam/sorted/{sample}.{lane}.bam",
+        "results/bam/sorted/{sample}.{lane}.bam"
     params:
-        config["sambamba_sort"]["extra"],
-    threads: config["sambamba_sort"]["threads"]
-    log:
-        "results/logs/samtools_sort/{sample}.{lane}.log",
+        config["sambamba_sort"]["extra"]
+    threads:
+        config["sambamba_sort"]["threads"]
     wrapper:
-        "v4.5.0/bio/sambamba/sort"
+        "0.63.0/bio/sambamba/sort"
 
 
 def merge_inputs(wildcards):
