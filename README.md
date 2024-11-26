@@ -1,2 +1,6 @@
-# microsatellite-expression-quantification-snakemake-pipeline
-Quantify expression of RNA microsatellites using a snakemake pipeline
+# rnaseq-workflow
+Quantify expression of RNASeq.
+- Trim with cutadapt
+- Align with STAR
+- Count with feautureCounts
+- QC with MultiQC
